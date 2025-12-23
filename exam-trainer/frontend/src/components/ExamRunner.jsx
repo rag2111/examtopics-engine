@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Clock, CheckCircle, XCircle, ArrowLeft, ArrowRight, Home, Repeat, Eye, EyeOff, Edit2, LogOut } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, ArrowLeft, ArrowRight, Home, Repeat, Eye, EyeOff, Edit2, LogOut, MessageSquare } from 'lucide-react';
 import QuestionEditor from './QuestionEditor';
 
 const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => {
@@ -11,6 +11,7 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
 
     const [userAnswers, setUserAnswers] = useState({});
     const [showAnswer, setShowAnswer] = useState(false);
+    const [showComments, setShowComments] = useState(false);
     const [isFinished, setIsFinished] = useState(false);
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [savedResult, setSavedResult] = useState(false);
@@ -156,6 +157,12 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
         }
     }, [isFinished, savedResult, sessionQuestions, filename, timeElapsed, userAnswers]);
 
+
+    // Reset view state when question changes
+    useEffect(() => {
+        setShowAnswer(false);
+        setShowComments(false);
+    }, [currentIndex, sessionQuestions]);
 
     if (loading) return <div>Loading questions...</div>;
     if (sessionQuestions.length === 0) return <div>No questions found.</div>;
@@ -318,10 +325,18 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
                 </div>
 
                 <div className="actions" style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
-                    <button onClick={() => setShowAnswer(!showAnswer)} className="secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        {showAnswer ? <EyeOff size={18} /> : <Eye size={18} />}
-                        {showAnswer ? 'Hide Answer' : 'Reveal Answer'}
-                    </button>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button onClick={() => setShowAnswer(!showAnswer)} className="secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            {showAnswer ? <EyeOff size={18} /> : <Eye size={18} />}
+                            {showAnswer ? 'Hide Answer' : 'Reveal Answer'}
+                        </button>
+                        {currentQ.comments && (
+                            <button onClick={() => setShowComments(!showComments)} className="secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <MessageSquare size={18} />
+                                {showComments ? 'Hide Comments' : 'Comments'}
+                            </button>
+                        )}
+                    </div>
 
                     {showAnswer && (
                         <div style={{ fontSize: '1.2em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', animation: 'fadeIn 0.3s ease' }}>
@@ -330,6 +345,24 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
                         </div>
                     )}
                 </div>
+
+
+                {showComments && currentQ.comments && (
+                    <div className="comments-section" style={{
+                        marginTop: '1.5rem',
+                        padding: '1rem',
+                        background: 'rgba(0,0,0,0.2)',
+                        borderRadius: '8px',
+                        textAlign: 'left',
+                        fontSize: '0.9em',
+                        borderLeft: '3px solid var(--primary-color)',
+                        animation: 'fadeIn 0.3s ease',
+                        whiteSpace: 'pre-wrap'
+                    }}>
+                        <strong>Comments:</strong><br />
+                        {currentQ.comments}
+                    </div>
+                )}
             </div>
 
             <div className="navigation" style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
@@ -355,7 +388,7 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
                     </button>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
 

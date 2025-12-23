@@ -78,14 +78,32 @@ function parseMarkdown(content) {
             questionObj.answer = questionObj.suggestedAnswer;
         }
 
-        // Capture footer (from Answer line to end)
-        // If we found answerLine, footer is everything after.
-        // If not, maybe just the last few lines?
-        // Let's just create a generic footer if we can't find it to avoid data loss on crucial parts?
-        // Or try to slice from **Answer:**
+        // Extract Comments & Footer
+        // Logic: Footer is after Answer. Comments are after Footer (usually).
+        // If "Comments:" line exists, everything after it is comments.
+        // Everything between Answer and Comments is Footer.
+
         const answerIdx = lines.findIndex(l => l.startsWith('**Answer:'));
+        const commentsIdx = lines.findIndex(l => l.startsWith('Comments:'));
+
+        if (commentsIdx !== -1) {
+            const commentLines = lines.slice(commentsIdx);
+            // Remove "Comments:" prefix from the first line for cleaner display
+            commentLines[0] = commentLines[0].replace(/^Comments:\s*/, '');
+            questionObj.comments = commentLines.join('\n').trim();
+        } else {
+            questionObj.comments = null;
+        }
+
         if (answerIdx !== -1) {
-            questionObj.footer = lines.slice(answerIdx + 1).join('\n');
+            // Footer is from answerIdx + 1 until commentsIdx (if it exists and is after answer) or end
+            let footerEnd = lines.length;
+            if (commentsIdx !== -1 && commentsIdx > answerIdx) {
+                footerEnd = commentsIdx;
+            }
+
+            const footerLines = lines.slice(answerIdx + 1, footerEnd);
+            questionObj.footer = footerLines.join('\n').trim();
         } else {
             questionObj.footer = "";
         }
@@ -105,6 +123,8 @@ function stringifyQuestions(questions) {
         // Default footer if missing
         const footer = q.footer || `\n**Timestamp: ${new Date().toLocaleString()}**\n\n[View on ExamTopics](https://www.examtopics.com)`;
 
+        const commentsSection = q.comments ? `\n\nComments: ${q.comments}` : '';
+
         return `## Exam GH-300 topic ${q.topic} question ${q.id} discussion
 
 Actual exam question from
@@ -123,7 +143,7 @@ Suggested Answer: ${q.answer} 🗳️
 ${optionsText}
 
 **Answer: ${q.answer}**
-${footer}`;
+${footer}${commentsSection}`;
     }).join('\n\n----------------------------------------\n\n');
 }
 
