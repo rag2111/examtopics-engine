@@ -11,6 +11,8 @@ function App() {
   const [examConfig, setExamConfig] = useState({ count: 10, shuffle: false });
   const [customQuestions, setCustomQuestions] = useState(null); // For retry mode
 
+  const [sessionId, setSessionId] = useState(0);
+
   const handleSelectExam = (filename) => {
     setSelectedExam(filename);
     setCustomQuestions(null);
@@ -19,12 +21,14 @@ function App() {
 
   const handleStartExam = (config) => {
     setExamConfig(config);
+    setSessionId(prev => prev + 1);
     setView('runner');
   };
 
   const handleRetry = (missedQuestions) => {
     setCustomQuestions(missedQuestions);
-    setExamConfig({ count: missedQuestions.length, shuffle: false }); // Force no shuffle for retry usually? or maybe keep it.
+    setExamConfig({ count: missedQuestions.length, shuffle: false });
+    setSessionId(prev => prev + 1);
     setView('runner');
   };
 
@@ -60,11 +64,12 @@ function App() {
       )}
       {view === 'runner' && selectedExam && (
         <ExamRunner
+          key={sessionId}
           filename={selectedExam}
           config={examConfig}
           initialQuestions={customQuestions}
           onRetry={handleRetry}
-          onExit={() => setView('list')} // Exit to home
+          onExit={() => setView('list')}
         />
       )}
     </div>

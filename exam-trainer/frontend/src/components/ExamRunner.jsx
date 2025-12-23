@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Clock, CheckCircle, XCircle, ArrowLeft, ArrowRight, Home, Repeat, Eye, EyeOff, Edit2, LogOut } from 'lucide-react';
 import QuestionEditor from './QuestionEditor';
 
 const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => {
@@ -172,44 +173,59 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
 
         return (
             <div className="exam-results glass-panel">
-                <h1 style={{ color: passed ? 'var(--success)' : 'var(--danger)' }}>
-                    {passed ? 'Passed!' : 'Failed'}
-                </h1>
-                <h2>Score: {score} / {total} ({percent}%)</h2>
-                <h3>Time: {formatTime(timeElapsed)}</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+                    {passed ? <CheckCircle size={64} color="var(--success)" /> : <XCircle size={64} color="var(--danger)" />}
+                    <h1 style={{ color: passed ? 'var(--success)' : 'var(--danger)', margin: '1rem 0 0.5rem 0' }}>
+                        {passed ? 'Passed!' : 'Failed'}
+                    </h1>
+                    <h2 style={{ fontSize: '2rem', margin: '0.5rem 0' }}>{score} / {total} <span style={{ fontSize: '0.6em', opacity: 0.7 }}>({percent}%)</span></h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.7 }}>
+                        <Clock size={16} />
+                        <h3>{formatTime(timeElapsed)}</h3>
+                    </div>
+                </div>
 
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
-                    <button onClick={onExit}>Back to Home</button>
+                    <button onClick={onExit} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Home size={18} /> Back to Home
+                    </button>
                     {wrongQuestions.length > 0 && (
                         <button
                             className="secondary"
                             onClick={() => onRetry && onRetry(wrongQuestions)}
                             title="Start a new exam with only the questions you missed"
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                         >
+                            <Repeat size={18} />
                             Retry Missed ({wrongQuestions.length})
                         </button>
                     )}
                 </div>
 
-                <div style={{ textAlign: 'left', marginTop: '2rem' }}>
-                    <h3>Review</h3>
+                <div style={{ textAlign: 'left', marginTop: '3rem' }}>
+                    <h3 style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem', marginBottom: '1.5rem' }}>Review</h3>
                     {sessionQuestions.map((q, idx) => {
                         const userAns = userAnswers[getQuestionKey(q)];
                         const isCorrect = userAns === q.answer;
                         return (
                             <div key={idx} style={{
-                                padding: '1rem',
+                                padding: '1.5rem',
                                 margin: '1rem 0',
-                                border: `1px solid ${isCorrect ? 'var(--success)' : 'var(--danger)'}`,
-                                borderRadius: '8px',
+                                borderLeft: `4px solid ${isCorrect ? 'var(--success)' : 'var(--danger)'}`,
+                                borderRadius: '0 8px 8px 0',
                                 background: 'rgba(255,255,255,0.05)'
                             }}>
-                                <div><strong>Q{idx + 1}:</strong> {q.questionText}</div>
-                                <div style={{ marginTop: '0.5rem' }}>
-                                    <span style={{ color: isCorrect ? 'var(--success)' : 'var(--danger)' }}>
+                                <div style={{ fontWeight: 'bold', marginBottom: '1rem', color: isCorrect ? 'var(--success)' : 'var(--danger)' }}>
+                                    Question {idx + 1}
+                                </div>
+                                <div style={{ marginBottom: '1rem' }}>{q.questionText}</div>
+                                <div style={{ marginTop: '0.5rem', display: 'flex', gap: '2rem' }}>
+                                    <span style={{ color: isCorrect ? 'var(--success)' : 'var(--danger)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        {isCorrect ? <CheckCircle size={16} /> : <XCircle size={16} />}
                                         Your Answer: {userAns || 'None'}
                                     </span>
-                                    {!isCorrect && <span style={{ marginLeft: '1rem', color: 'var(--success)' }}>
+                                    {!isCorrect && <span style={{ color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <CheckCircle size={16} />
                                         Correct: {q.answer}
                                     </span>}
                                 </div>
@@ -235,23 +251,29 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
                 />
             )}
 
-            <div className="header glass-panel" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <span>Question {currentIndex + 1} of {sessionQuestions.length}</span>
-                <span style={{ fontFamily: 'monospace', fontSize: '1.2em' }}>{formatTime(timeElapsed)}</span>
-                <button onClick={onExit}>Exit</button>
+            <div className="header glass-panel" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '0.8rem 1.5rem' }}>
+                <span style={{ fontWeight: 'bold' }}>Question {currentIndex + 1} <span style={{ opacity: 0.5 }}>/ {sessionQuestions.length}</span></span>
+                <span style={{ fontFamily: 'monospace', fontSize: '1.2em', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0,0,0,0.2)', padding: '0.3rem 0.8rem', borderRadius: '4px' }}>
+                    <Clock size={16} /> {formatTime(timeElapsed)}
+                </span>
+                <button onClick={onExit} className="small secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <LogOut size={16} /> Exit
+                </button>
             </div>
 
-            <div className="question-card glass-panel">
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>Topic {currentQ.topic} | Question #{currentQ.id}</span>
-                    <button onClick={() => setEditingQuestion(currentQ)} style={{ fontSize: '0.8em', padding: '0.3em 0.8em' }}>Edit</button>
+            <div className="question-card glass-panel" style={{ position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>Topic {currentQ.topic} | #{currentQ.id}</span>
+                    <button onClick={() => setEditingQuestion(currentQ)} className="small secondary" style={{ fontSize: '0.8em', padding: '0.3em 0.8em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Edit2 size={14} /> Edit
+                    </button>
                 </div>
 
-                <p style={{ fontSize: '1.2em', whiteSpace: 'pre-wrap', textAlign: 'left', margin: '1.5rem 0' }}>
+                <p style={{ fontSize: '1.2em', whiteSpace: 'pre-wrap', textAlign: 'left', margin: '1.5rem 0', lineHeight: '1.6' }}>
                     {currentQ.questionText}
                 </p>
 
-                <div className="options" style={{ textAlign: 'left' }}>
+                <div className="options" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                     {currentQ.options.map((opt, idx) => {
                         const letter = opt.match(/^([A-Z])\./)?.[1];
                         const isSelected = selectedAnswer === letter;
@@ -259,13 +281,16 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
 
                         let borderColor = 'transparent';
                         let bgColor = 'rgba(255,255,255,0.05)';
+                        let transform = 'scale(1)';
 
                         if (isSelected) {
                             borderColor = 'var(--primary-color)';
-                            bgColor = 'rgba(100, 108, 255, 0.1)';
+                            bgColor = 'rgba(100, 108, 255, 0.15)';
+                            transform = 'scale(1.01)';
                         }
                         if (showAnswer && isCorrectAnswer) {
                             borderColor = 'var(--success)';
+                            bgColor = 'rgba(46, 204, 113, 0.15)';
                         }
 
                         return (
@@ -274,28 +299,33 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
                                 className="option-item"
                                 onClick={() => handleOptionSelect(currentQ, opt)}
                                 style={{
-                                    padding: '1rem',
-                                    margin: '0.5rem 0',
+                                    padding: '1.2rem',
                                     background: bgColor,
-                                    borderRadius: '8px',
+                                    borderRadius: '12px',
                                     border: `2px solid ${borderColor}`,
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
+                                    display: 'flex',
+                                    gap: '1rem',
+                                    transform: transform
                                 }}
                             >
-                                {opt}
+                                <span style={{ fontWeight: 'bold', minWidth: '1.5rem' }}>{letter}.</span>
+                                <div>{opt.substring(opt.indexOf('.') + 1).trim()}</div>
                             </div>
                         );
                     })}
                 </div>
 
-                <div className="actions" style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <button onClick={() => setShowAnswer(!showAnswer)}>
+                <div className="actions" style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
+                    <button onClick={() => setShowAnswer(!showAnswer)} className="secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        {showAnswer ? <EyeOff size={18} /> : <Eye size={18} />}
                         {showAnswer ? 'Hide Answer' : 'Reveal Answer'}
                     </button>
 
                     {showAnswer && (
-                        <div style={{ fontSize: '1.2em', fontWeight: 'bold' }}>
+                        <div style={{ fontSize: '1.2em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', animation: 'fadeIn 0.3s ease' }}>
+                            <CheckCircle size={20} color="var(--success)" />
                             Correct: <span style={{ color: 'var(--success)' }}>{currentQ.answer}</span>
                         </div>
                     )}
@@ -303,17 +333,27 @@ const ExamRunner = ({ filename, config, initialQuestions, onRetry, onExit }) => 
             </div>
 
             <div className="navigation" style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-                <button disabled={currentIndex === 0} onClick={() => { setCurrentIndex(c => c - 1); setShowAnswer(false); }}>
-                    Previous
+                <button
+                    disabled={currentIndex === 0}
+                    onClick={() => { setCurrentIndex(c => c - 1); setShowAnswer(false); }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <ArrowLeft size={18} /> Previous
                 </button>
-                <button disabled={currentIndex === sessionQuestions.length - 1} onClick={() => { setCurrentIndex(c => c + 1); setShowAnswer(false); }}>
-                    Next
-                </button>
-                <button className="primary" style={{ backgroundColor: 'var(--success)', borderColor: 'var(--success)', marginLeft: 'auto' }} onClick={() => {
-                    if (confirm('Finish exam and see results?')) setIsFinished(true);
-                }}>
-                    Finish Exam
-                </button>
+
+                {currentIndex < sessionQuestions.length - 1 ? (
+                    <button
+                        onClick={() => { setCurrentIndex(c => c + 1); setShowAnswer(false); }}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        Next <ArrowRight size={18} />
+                    </button>
+                ) : (
+                    <button
+                        className="primary"
+                        style={{ backgroundColor: 'var(--success)', borderColor: 'var(--success)', marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                        onClick={() => setIsFinished(true)}>
+                        <CheckCircle size={18} /> Finish Exam
+                    </button>
+                )}
             </div>
         </div>
     );

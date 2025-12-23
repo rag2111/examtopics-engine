@@ -5,14 +5,16 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #1a1a1a; /* Fallback */
+  background-color: #1a1a1a;
+  /* Fallback */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --primary-color: #646cff; /* Vibrant Indigo */
+  --primary-color: #646cff;
+  /* Vibrant Indigo */
   --primary-hover: #747bff;
   --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
   --glass-bg: rgba(255, 255, 255, 0.05);
@@ -64,7 +66,7 @@ button:hover {
 }
 
 button:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
 button:focus,
@@ -82,22 +84,85 @@ h1 {
 }
 
 .glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 16px;
-    border: 1px solid var(--glass-border);
-    padding: 2rem;
-    box-shadow: var(--glass-shadow);
-    text-align: left;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  padding: 2rem;
+  box-shadow: var(--glass-shadow);
+  text-align: left;
 }
 
-input, select {
-    background: rgba(0,0,0,0.2);
-    border: 1px solid var(--glass-border);
-    color: white;
-    padding: 0.5rem;
-    border-radius: 6px;
-    font-size: 1rem;
-    margin: 0.5rem 0;
+input,
+select {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  color: white;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.card-styled {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+button.primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(100, 108, 255, 0.3);
+}
+
+button.primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(100, 108, 255, 0.4);
+}
+
+button.secondary {
+  background-color: transparent;
+  border: 1px solid var(--glass-border);
+}
+
+button.secondary:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+button.small {
+  padding: 0.4em 0.8em;
+  font-size: 0.9em;
+}
+
+.spin {
+  animation: logo-spin 1s infinite linear;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.exam-card.interacted:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--primary-color);
 }
